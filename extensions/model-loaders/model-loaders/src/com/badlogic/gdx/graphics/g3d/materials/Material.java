@@ -16,13 +16,16 @@
 
 package com.badlogic.gdx.graphics.g3d.materials;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.graphics.g3d.experimental.MaterialShaderHandler;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 
 public class Material {
 	protected String name;
-	public Array<MaterialAttribute> attributes;
+	public List<MaterialAttribute> attributes;
 
 	/** This flag is true if material contain blendingAttribute */
 	protected boolean needBlending;
@@ -34,16 +37,16 @@ public class Material {
 	}
 
 	public Material () {
-		attributes = new Array<MaterialAttribute>(2);
+		attributes = new ArrayList<MaterialAttribute>(2);
 	}
 
-	public Material (String name, Array<MaterialAttribute> attributes) {
+	public Material (String name, List<MaterialAttribute> attributes) {
 		this.name = name;
 		this.attributes = attributes;
 
 		// this way we foresee if blending is needed with this material and rendering can deferred more easily
 		this.needBlending = false;
-		for (int i = 0; i < this.attributes.size; i++) {
+		for (int i = 0; i < this.attributes.size(); i++) {
 			if (this.attributes.get(i) instanceof BlendingAttribute) {
 				this.needBlending = true;
 				break;
@@ -53,11 +56,12 @@ public class Material {
 
 	public Material (String name, MaterialAttribute... attributes) {
 		this.name = name;
-		this.attributes = new Array<MaterialAttribute>(attributes);
+		this.attributes = new ArrayList<MaterialAttribute>();
 
 		// this way we foresee if blending is needed with this material and rendering can deferred more easily
 		this.needBlending = false;
-		for (int i = 0; i < this.attributes.size; i++) {
+		for (int i = 0; i < attributes.length; i++) {
+			this.attributes.add(attributes[i]);
 			if (this.attributes.get(i) instanceof BlendingAttribute) {
 				this.needBlending = true;
 				break;
@@ -67,13 +71,13 @@ public class Material {
 	}
 
 	public void bind () {
-		for (int i = 0; i < attributes.size; i++) {
+		for (int i = 0; i < attributes.size(); i++) {
 			attributes.get(i).bind();
 		}
 	}
 
 	public void bind (ShaderProgram program) {
-		for (int i = 0; i < attributes.size; i++) {
+		for (int i = 0; i < attributes.size(); i++) {
 			attributes.get(i).bind(program);
 		}
 	}
@@ -83,8 +87,8 @@ public class Material {
 	}
 
 	public Material copy () {
-		Array<MaterialAttribute> attributes = new Array<MaterialAttribute>(this.attributes.size);
-		for (int i = 0; i < attributes.size; i++) {
+		ArrayList<MaterialAttribute> attributes = new ArrayList<MaterialAttribute>(this.attributes.size());
+		for (int i = 0; i < attributes.size(); i++) {
 			attributes.add(this.attributes.get(i).copy());
 		}
 		final Material copy = new Material(name, attributes);
@@ -107,8 +111,8 @@ public class Material {
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		Material other = (Material)obj;
-		if (other.attributes.size != attributes.size) return false;
-		for (int i = 0; i < attributes.size; i++) {
+		if (other.attributes.size() != attributes.size()) return false;
+		for (int i = 0; i < attributes.size(); i++) {
 			if (!attributes.get(i).equals(other.attributes.get(i))) return false;
 		}
 		if (name == null) {
@@ -120,8 +124,8 @@ public class Material {
 	public boolean shaderEquals (Material other) {
 		if (this == other) return true;
 
-		int len = this.attributes.size;
-		if (len != other.attributes.size) return false;
+		int len = this.attributes.size();
+		if (len != other.attributes.size()) return false;
 
 		for (int i = 0; i < len; i++) {
 			final String str = this.attributes.get(i).name;
@@ -145,7 +149,7 @@ public class Material {
 		shader = material.shader;
 		needBlending = material.needBlending;
 		attributes.clear();
-		for (int i = 0, len = material.attributes.size; i < len; i++) {
+		for (int i = 0, len = material.attributes.size(); i < len; i++) {
 			attributes.add(material.attributes.get(i).pooledCopy());
 		}
 	}

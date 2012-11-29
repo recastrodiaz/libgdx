@@ -29,9 +29,9 @@ public class StillModel implements Model {
 
 	public StillModel (SubMesh[] subMeshes) {
 		this.subMeshes = new StillSubMesh[subMeshes.length];
-		for (int i = 0; i < subMeshes.length ; ++i) {
+		for (int i = 0; i < subMeshes.length; ++i) {
 			this.subMeshes[i] = (StillSubMesh)subMeshes[i];
-		}	
+		}
 	}
 
 	@Override
@@ -39,10 +39,12 @@ public class StillModel implements Model {
 		int len = subMeshes.length;
 		for (int i = 0; i < len; i++) {
 			StillSubMesh subMesh = subMeshes[i];
-			if (i == 0) {
-				subMesh.material.bind();
-			} else if (!subMeshes[i - 1].material.equals(subMesh.material)) {
-				subMesh.material.bind();
+			if (subMesh.material != null) {
+				if (i == 0) {
+					subMesh.material.bind();
+				} else if (!subMeshes[i - 1].material.equals(subMesh.material)) {
+					subMesh.material.bind();
+				}
 			}
 			subMesh.mesh.render(subMesh.primitiveType);
 		}
@@ -53,10 +55,12 @@ public class StillModel implements Model {
 		int len = subMeshes.length;
 		for (int i = 0; i < len; i++) {
 			StillSubMesh subMesh = subMeshes[i];
-			if (i == 0) {
-				subMesh.material.bind(program);
-			} else if (!subMeshes[i - 1].material.equals(subMesh.material)) {
-				subMesh.material.bind(program);
+			if (subMesh.material != null) {
+				if (i == 0) {
+					subMesh.material.bind(program);
+				} else if (!subMeshes[i - 1].material.equals(subMesh.material)) {
+					subMesh.material.bind(program);
+				}
 			}
 			subMesh.mesh.render(program, subMesh.primitiveType);
 		}

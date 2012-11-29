@@ -2,6 +2,7 @@
 package com.badlogic.gdx.graphics.g3d.test;
 
 import java.util.Comparator;
+import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
@@ -27,6 +28,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.sun.org.apache.bcel.internal.classfile.Attribute;
 
 //stuff that happens
 //0. render begin
@@ -127,7 +129,7 @@ public class PrototypeRendererGL20 implements ModelRenderer {
 					matrixChanged = false;
 				}
 
-				for (int k = 0, len = material.attributes.size; k < len; k++) {
+				for (int k = 0, len = material.attributes.size(); k < len; k++) {
 					final MaterialAttribute atrib = material.attributes.get(k);
 
 					// special case for textures. really important to batch these
@@ -236,7 +238,7 @@ public class PrototypeRendererGL20 implements ModelRenderer {
 					matrixChanged = false;
 				}
 
-				for (int k = 0, len = material.attributes.size; k < len; k++) {
+				for (int k = 0, len = material.attributes.size(); k < len; k++) {
 					final MaterialAttribute atrib = material.attributes.get(k);
 
 					// yet another instanceof. TODO is there any better way to do this? maybe stuffing this to material
@@ -317,12 +319,14 @@ public class PrototypeRendererGL20 implements ModelRenderer {
 			while (drawables.size > 0) {
 				final Drawable drawable = drawables.pop();
 
-				// return all materials and attribuets to the pools
+				// return all materials and attributes to the pools
 				while (drawable.materials.size > 0) {
 					final Material material = drawable.materials.pop();
 
-					while (material.attributes.size > 0) {
-						material.attributes.pop().free();
+					Iterator<MaterialAttribute> it = material.attributes.iterator();
+					while (it.hasNext()) {
+						MaterialAttribute attribute = it.next();
+						attribute.free();
 					}
 					material.resetShader();
 					materialPool.free(material);
